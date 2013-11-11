@@ -1,0 +1,30 @@
+{
+  "name": "theychat",
+  "version": "0.0.1",
+  "description": "you know tuhao chat",
+  "main": "index.js",
+  "dependencies": {
+    "node-xmpp": "~0.7.2"
+  },
+  "devDependencies": {
+    "mysql": "~2.0.0-alpha9",
+    "node-xmpp": "~0.7.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "mangix",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/DZTGroup/theychat.git"
+  },
+  "keywords": [
+    "xmpp",
+    "chat",
+    "mobile"
+  ],
+  "bugs": {
+    "url": "https://github.com/DZTGroup/theychat/issues"
+  }
+}
