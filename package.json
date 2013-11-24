@@ -8,9 +8,8 @@
   },
   "devDependencies": {
     "mysql": "~2.0.0-alpha9",
-    "node-xmpp": "~0.7.2",
+    "node-xmpp": "~0.10.6",
     "node-stringprep": "~0.1.8",
-    "xmpp-server": "0.0.3",
     "ltx": "~0.3.2"
   },
   "scripts": {
