@@ -22,12 +22,13 @@ Server.prototype._initAuth = function(){
             });
         });
 
+
         // Allows the developer to authenticate users against anything they want.
         client.on("authenticate", function (opts, cb) {
             console.log("AUTH:" + opts.jid + " -> " + opts.password);
             User.auth(opts.jid,opts.password,function(error,success){
                 if(error){
-                    cb(error);
+                  cb(error);
                 }else {
                     cb();
                 }

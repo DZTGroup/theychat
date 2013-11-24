@@ -7,14 +7,16 @@ var CODES = {
 
 var User = {
     exist:function(user){
-        var query = 'select * from XMPP.USER where User="'+user+'"';
+        var query = 'select * from theychat.user where name="'+user.toString().split("@")[0]+'"';
+        console.log(query);
         connection.query(query,function(err,rows,fields){
             cb(error,!!rows.length);
         });
 
     },
     auth:function(user, password ,cb){
-        var query = 'select * from XMPP.USER where User="'+user+'" and password=password("'+ password+'")';
+        var query = 'select * from theychat.user where name="'+user.toString().split("@")[0]+'" and password="'+ password+'"';
+        console.log(query);
         connection.query(query,function(err,rows,fields){
             var suc = false,
                 error = err;
@@ -22,9 +24,10 @@ var User = {
                 error = new Error('login failed');
             }else {
                 suc = true;
+                console.log('auth successfully');
             }
             if(error){
-                console.log(error);
+                cb(error);
             }
         });
     },
