@@ -25,5 +25,8 @@
   ],
   "bugs": {
     "url": "https://github.com/DZTGroup/theychat/issues"
+  },
+  "dependencies": {
+    "connect": "~2.11.0"
   }
 }

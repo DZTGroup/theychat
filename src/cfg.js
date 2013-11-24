@@ -1,4 +1,5 @@
 module.exports = {
     domain:'localhost',
-    port:5222
+    port:5222,
+    boshPort:5333
 };

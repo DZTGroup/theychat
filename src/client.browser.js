@@ -1,6 +1,6 @@
 var cl = new XMPP.Client({
-    websocketsURL: "ws://localhost:5222/",
-    //boshURL: "https://beta.buddycloud.org/http-bind/",
+    //websocketsURL: "ws://0.0.0.0:5280/",
+    boshURL: "http://localhost:5333/",
     jid: 'test@localhost',
     password: '***'
 });

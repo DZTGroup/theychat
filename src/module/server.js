@@ -1,11 +1,16 @@
 var xmpp = require('node-xmpp');
 var User = require('./user');
 var Router = require('./router');
+var http = require('http')
+var connect = require('connect');
+var path = require('path')
 
 var Server = function(config){
+    this.config = config;
     this.c2sServer = new xmpp.C2SServer(config);
     this._initRouter(); //init xmpp-server's Router
     this._initAuth();   //init login and register
+    this._initBoshServer();
 };
 
 Server.prototype._initAuth = function(){
@@ -43,5 +48,22 @@ Server.prototype._initRouter = function(){
     this.router = this.c2sServer.router;
 };
 
+Server.prototype._initBoshServer = function(){
+    var sv = this.boshServer = new xmpp.BOSHServer();
 
+    var app = connect();
+    app.use(connect.static(path.resolve(__dirname,'../../')));
+    app.use(function (req, res, next) {
+        sv.handleHTTP(req, res);
+    });
+
+    http.createServer(app).listen(this.config.boshPort);
+
+    sv.on('connect', function(svcl_) {
+        c2s = new xmpp.C2SStream({ connection: svcl_ })
+        c2s.on('authenticate', function(opts, cb) {
+            cb(true)
+        })
+    })
+};
 module.exports = Server;
