@@ -3,15 +3,11 @@
   "version": "0.0.1",
   "description": "you know tuhao chat",
   "main": "index.js",
-  "dependencies": {
-    "node-xmpp": "~0.7.2"
-  },
   "devDependencies": {
     "mysql": "~2.0.0-alpha9",
-    "node-xmpp": "~0.7.2",
     "node-stringprep": "~0.1.8",
-    "xmpp-server": "0.0.3",
-    "ltx": "~0.3.2"
+    "ltx": "~0.3.2",
+    "node-xmpp": "~0.10.7"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
