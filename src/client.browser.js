@@ -1,8 +1,8 @@
 var cl = new XMPP.Client({
     //websocketsURL: "ws://0.0.0.0:5280/",
     boshURL: "http://localhost:5333/",
-    jid: 'test@localhost',
-    password: '***'
+    jid: 'laomao@localhost',
+    password: '123456'
 });
 cl.addListener('online', function() {
     console.log('online');

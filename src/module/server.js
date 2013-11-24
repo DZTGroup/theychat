@@ -9,37 +9,42 @@ var Server = function(config){
     this.config = config;
     this.c2sServer = new xmpp.C2SServer(config);
     this._initRouter(); //init xmpp-server's Router
-    this._initAuth();   //init login and register
+    this._initAuth(this.c2sServer);   //init login and register
     this._initBoshServer();
 };
 
-Server.prototype._initAuth = function(){
+Server.prototype._register = function(client){
+    client.on("register", function (opts, cb) {
+        console.log('register',opts.jid,'->',opts.password);
+        User.register(opts.jid,opts.passowrd,function(error,success){
+            if(error){
+                cb(error);
+            }else {
+                cb();
+            }
+        });
+    });
+};
+
+Server.prototype._auth = function(client){
+    client.on("authenticate", function (opts, cb) {
+        console.log("AUTH:" + opts.jid + " -> " + opts.password);
+        User.auth(opts.jid,opts.password,function(error,success){
+            if(error){
+                cb(error);
+            }else {
+                cb();
+            }
+
+        });
+    });
+};
+
+Server.prototype._initAuth = function(server){
     var self = this;
-    this.c2sServer.on('connect',function(client){
-        client.on("register", function (opts, cb) {
-            console.log('register',opts.jid,'->',opts.password);
-            User.register(opts.jid,opts.passowrd,function(error,success){
-                if(error){
-                    cb(error);
-                }else {
-                    cb();
-                }
-            });
-        });
-
-
-        // Allows the developer to authenticate users against anything they want.
-        client.on("authenticate", function (opts, cb) {
-            console.log("AUTH:" + opts.jid + " -> " + opts.password);
-            User.auth(opts.jid,opts.password,function(error,success){
-                if(error){
-                  cb(error);
-                }else {
-                    cb();
-                }
-
-            });
-        });
+    server.on('connect',function(client){
+        self._register(client);
+        self._auth(client);
     });
 };
 
@@ -49,6 +54,7 @@ Server.prototype._initRouter = function(){
 };
 
 Server.prototype._initBoshServer = function(){
+    var self = this;
     var sv = this.boshServer = new xmpp.BOSHServer();
 
     var app = connect();
@@ -58,12 +64,12 @@ Server.prototype._initBoshServer = function(){
     });
 
     http.createServer(app).listen(this.config.boshPort);
+    this._initAuth(sv);
 
     sv.on('connect', function(svcl_) {
-        c2s = new xmpp.C2SStream({ connection: svcl_ })
-        c2s.on('authenticate', function(opts, cb) {
-            cb(true)
-        })
-    })
+        c2s = new xmpp.C2SStream({ connection: svcl_ });
+        self._register(c2s);
+        self._auth(c2s);
+    });
 };
 module.exports = Server;
