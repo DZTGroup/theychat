@@ -29,6 +29,7 @@ var User = {
             if(error){
                 cb(error);
             }
+            cb(error,suc);
         });
     },
     register:function(user,password,cb){
