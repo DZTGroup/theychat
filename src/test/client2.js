@@ -1,5 +1,5 @@
 var xmpp = require('node-xmpp'); 
-var config = require('./cfg');
+var config = require('./../cfg');
 
 var clientLaomao = new xmpp.Client({
   jid:"laomao@"+config.domain,

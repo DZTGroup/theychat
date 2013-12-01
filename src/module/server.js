@@ -1,9 +1,11 @@
 var xmpp = require('node-xmpp');
 var User = require('./user');
 var Router = require('./router');
-var http = require('http')
+var http = require('http');
 var connect = require('connect');
-var path = require('path')
+var path = require('path');
+var express= require('express');
+var app	= express()
 
 var Server = function(config){
     this.config = config;
@@ -40,6 +42,14 @@ Server.prototype._auth = function(client){
     });
 };
 
+Server.prototype._stanza=function(client){
+
+    client.on('stanza', function(stanza) {
+        console.log('STANZA' + stanza);
+        client.send(new xmpp.Message({ type: 'chat' }).c('body').t('Hello there, little client.'))
+    })
+};
+
 Server.prototype._initAuth = function(server){
     var self = this;
     server.on('connect',function(client){
@@ -57,10 +67,17 @@ Server.prototype._initBoshServer = function(){
     var self = this;
     var sv = this.boshServer = new xmpp.BOSHServer();
 
-    var app = connect();
-    app.use(connect.static(path.resolve(__dirname,'../../')));
+    //var app = connect();
+    //app.use(connect.static(path.resolve(__dirname,'../../')));
+    app.use("/styles", express.static(__dirname + '/../public/styles'));
+    app.use("/scripts", express.static(__dirname + '/../public/scripts'));
+    app.use("/images", express.static(__dirname + '/../public/images'));
     app.use(function (req, res, next) {
         sv.handleHTTP(req, res);
+    });
+
+    app.get('/', function (req, res) {
+        res.sendfile(__dirname + '/../public/index.html');
     });
 
     http.createServer(app).listen(this.config.boshPort);
@@ -70,6 +87,7 @@ Server.prototype._initBoshServer = function(){
         c2s = new xmpp.C2SStream({ connection: svcl_ });
         self._register(c2s);
         self._auth(c2s);
+        self._stanza(c2s);
     });
 };
 module.exports = Server;
