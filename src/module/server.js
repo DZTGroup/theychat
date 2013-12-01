@@ -4,8 +4,9 @@ var Router = require('./router');
 var http = require('http');
 var connect = require('connect');
 var path = require('path');
-var express= require('express');
-var app	= express()
+var _=require('underscore');
+//var express= require('express');
+//var app	= express();
 
 var Server = function(config){
     this.config = config;
@@ -13,6 +14,7 @@ var Server = function(config){
     this._initRouter(); //init xmpp-server's Router
     this._initAuth(this.c2sServer);   //init login and register
     this._initBoshServer();
+    this.session={};
 };
 
 Server.prototype._register = function(client){
@@ -29,12 +31,14 @@ Server.prototype._register = function(client){
 };
 
 Server.prototype._auth = function(client){
+    var that=this;
     client.on("authenticate", function (opts, cb) {
         console.log("AUTH:" + opts.jid + " -> " + opts.password);
         User.auth(opts.jid,opts.password,function(error,success){
             if(error){
                 cb(error);
             }else {
+                that.session[opts.jid]=client;
                 cb();
             }
 
@@ -43,10 +47,16 @@ Server.prototype._auth = function(client){
 };
 
 Server.prototype._stanza=function(client){
-
+    var that=this;
     client.on('stanza', function(stanza) {
         console.log('STANZA' + stanza);
-        client.send(new xmpp.Message({ type: 'chat' }).c('body').t('Hello there, little client.'))
+        _.forEach(that.session,function(s){
+                if(s!==client){
+                    s.send(new xmpp.Message({from:stanza.attrs.from.split("@")[0], type: 'chat' }).c('body').t(stanza.children[0].children[0]));
+                }
+            }
+        );
+
     })
 };
 
@@ -67,18 +77,18 @@ Server.prototype._initBoshServer = function(){
     var self = this;
     var sv = this.boshServer = new xmpp.BOSHServer();
 
-    //var app = connect();
-    //app.use(connect.static(path.resolve(__dirname,'../../')));
-    app.use("/styles", express.static(__dirname + '/../public/styles'));
-    app.use("/scripts", express.static(__dirname + '/../public/scripts'));
-    app.use("/images", express.static(__dirname + '/../public/images'));
+    var app = connect();
+    app.use(connect.static(path.resolve(__dirname,'../../')));
+    //app.use("/styles", express.static(__dirname + '/public/styles'));
+    //app.use("/scripts", express.static(__dirname + '/public/scripts'));
+    //app.use("/images", express.static(__dirname + '/public/images'));
     app.use(function (req, res, next) {
         sv.handleHTTP(req, res);
     });
 
-    app.get('/', function (req, res) {
-        res.sendfile(__dirname + '/../public/index.html');
-    });
+    //app.get('/', function (req, res) {
+    //    res.sendfile(__dirname + '/public/index.html');
+    //});
 
     http.createServer(app).listen(this.config.boshPort);
     this._initAuth(sv);
